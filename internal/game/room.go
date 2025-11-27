@@ -72,7 +72,9 @@ func (r *Room) Run() {
 		case p := <-r.Leave:
 			if _, exists := r.Players[p.ID]; exists {
 				delete(r.Players, p.ID)
-				p.SetRoom(nil)
+				if p.GetRoom() == r {
+					p.SetRoom(nil)
+				}
 
 				leavePkt, _ := json.Marshal(map[string]string{
 					"type": "delete_player",
