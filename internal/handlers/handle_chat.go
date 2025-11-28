@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"horseshoe-server/internal/game"
+	"horseshoe-server/internal/packets"
 	"log"
 )
 
@@ -25,16 +26,12 @@ func HandleChat(p *game.Player, world *game.World, data []byte) {
 		return
 	}
 
-	broadcastData, _ := json.Marshal(map[string]interface{}{
-		"type":    "player_message",
-		"id":      p.ID,
-		"message": string(msg),
-	})
+	pkt := packets.NewPlayerMessagePacket(p.ID, string(msg))
 
 	if room := p.GetRoom(); room != nil {
 		room.Broadcast <- game.BroadcastMsg{
 			SenderId: p.ID,
-			Data:     broadcastData,
+			Data:     pkt,
 		}
 	}
 }

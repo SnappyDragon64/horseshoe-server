@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"horseshoe-server/internal/game"
+	"horseshoe-server/internal/packets"
 	"horseshoe-server/internal/utils"
 	"log"
 )
@@ -19,16 +20,12 @@ func HandleMove(p *game.Player, world *game.World, data []byte) {
 
 	p.SetPos(req.Target)
 
-	broadcastData, _ := json.Marshal(map[string]interface{}{
-		"type":   "player_moved",
-		"id":     p.ID,
-		"target": req.Target,
-	})
+	pkt := packets.NewPlayerMovedPacket(p.ID, req.Target)
 
 	if room := p.GetRoom(); room != nil {
 		room.Broadcast <- game.BroadcastMsg{
 			SenderId: p.ID,
-			Data:     broadcastData,
+			Data:     pkt,
 		}
 	}
 }

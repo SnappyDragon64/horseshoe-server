@@ -1,6 +1,7 @@
 package game
 
 import (
+	"encoding/json"
 	"horseshoe-server/internal/utils"
 	"log"
 	"sync"
@@ -56,6 +57,20 @@ func (p *Player) GetPos() utils.Vector2 {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	return p.pos
+}
+
+func (p *Player) SendPacket(v interface{}) {
+	data, err := json.Marshal(v)
+	if err != nil {
+		log.Println("Error marshaling packet:", err)
+		return
+	}
+
+	select {
+	case p.Send <- data:
+	default:
+		close(p.Send)
+	}
 }
 
 func (p *Player) ReadPump(handleMessage func([]byte)) {

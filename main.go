@@ -1,9 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"horseshoe-server/internal/game"
 	"horseshoe-server/internal/handlers"
+	"horseshoe-server/internal/packets"
 	"log"
 	"net/http"
 
@@ -28,11 +28,8 @@ func main() {
 		player := game.NewPlayer(newId, conn)
 		world.AddPlayer(player)
 
-		connectMsg, _ := json.Marshal(map[string]string{
-			"type": "connect",
-			"id":   newId,
-		})
-		player.Send <- connectMsg
+		connectPkt := packets.NewConnectPacket(newId)
+		player.SendPacket(connectPkt)
 
 		go player.WritePump()
 

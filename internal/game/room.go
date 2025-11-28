@@ -2,11 +2,13 @@ package game
 
 import (
 	"encoding/json"
+	"horseshoe-server/internal/packets"
+	"log"
 )
 
 type BroadcastMsg struct {
 	SenderId string
-	Data     []byte
+	Data     interface{}
 }
 
 type Room struct {
@@ -35,39 +37,24 @@ func (r *Room) Run() {
 			r.Players[p.ID] = p
 			p.SetRoom(r)
 
-			currentPlayersList := make([]map[string]interface{}, 0)
+			currentPlayersList := make([]packets.PlayerData, 0)
 
 			for _, existingP := range r.Players {
 				if existingP.ID == p.ID {
 					continue
 				}
 
-				currentPlayersList = append(currentPlayersList, map[string]interface{}{
-					"id":  existingP.ID,
-					"pos": existingP.GetPos(),
+				currentPlayersList = append(currentPlayersList, packets.PlayerData{
+					ID:  existingP.ID,
+					Pos: existingP.GetPos(),
 				})
 
-				spawnPkt, _ := json.Marshal(map[string]interface{}{
-					"type": "spawn_player",
-					"id":   p.ID,
-					"pos":  p.GetPos(),
-				})
-
-				select {
-				case existingP.Send <- spawnPkt:
-				default:
-					close(existingP.Send)
-					delete(r.Players, existingP.ID)
-				}
+				spawnPkt := packets.NewSpawnPlayerPacket(p.ID, p.GetPos())
+				existingP.SendPacket(spawnPkt)
 			}
 
-			loadPkt, _ := json.Marshal(map[string]interface{}{
-				"type":    "load_room",
-				"id":      r.ID,
-				"pos":     p.GetPos(),
-				"players": currentPlayersList,
-			})
-			p.Send <- loadPkt
+			loadPkt := packets.NewLoadRoomPacket(r.ID, p.GetPos(), currentPlayersList)
+			p.SendPacket(loadPkt)
 
 		case p := <-r.Leave:
 			if _, exists := r.Players[p.ID]; exists {
@@ -76,26 +63,23 @@ func (r *Room) Run() {
 					p.SetRoom(nil)
 				}
 
-				leavePkt, _ := json.Marshal(map[string]string{
-					"type": "delete_player",
-					"id":   p.ID,
-				})
-
+				leavePkt := packets.NewDeletePlayerPacket(p.ID)
 				for _, p_ := range r.Players {
-					select {
-					case p_.Send <- leavePkt:
-					default:
-						close(p_.Send)
-						delete(r.Players, p_.ID)
-					}
+					p_.SendPacket(leavePkt)
 				}
 			}
 
 		case msg := <-r.Broadcast:
+			bytes, err := json.Marshal(msg.Data)
+			if err != nil {
+				log.Println("Broadcast marshal error:", err)
+				continue
+			}
+
 			for id, p := range r.Players {
 				if id != msg.SenderId {
 					select {
-					case p.Send <- msg.Data:
+					case p.Send <- bytes:
 					default:
 						close(p.Send)
 						delete(r.Players, id)
