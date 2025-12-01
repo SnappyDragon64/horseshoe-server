@@ -131,6 +131,14 @@ func main() {
 		claims := token.Claims.(jwt.MapClaims)
 		username := claims["username"].(string)
 
+		var user db.User
+		result := db.DB.Select("id").Where("username = ?", username).First(&user)
+
+		if result.Error != nil {
+			http.Error(w, "User no longer exists or DB error", 401)
+			return
+		}
+
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Println("Upgrade failed:", err)
