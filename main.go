@@ -25,8 +25,8 @@ func enableCORS(next http.HandlerFunc) http.HandlerFunc {
 		origin := r.Header.Get("Origin")
 
 		allowedOrigins := map[string]bool{
-			"html.itch.zone":        true,
-			"http://localhost:8060": true,
+			"https://html.itch.zone": true,
+			"http://localhost:8060":  true,
 		}
 
 		if allowedOrigins[origin] {
