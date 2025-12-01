@@ -60,6 +60,9 @@ jobs:
               --name horseshoe \
               --restart unless-stopped \
               -p 8080:8080 \
+              -v /var/lib/horseshoe:/data \
+              -e DB_PATH=/data/users.db \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
               ${{ env.IMAGE_NAME }}
             
             docker image prune -f
