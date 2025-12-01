@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"os"
 	"sync"
+
+	"github.com/gorilla/websocket"
 )
 
 type World struct {
@@ -56,12 +58,24 @@ func (w *World) GeneratePlayerId() string {
 
 func (w *World) AddPlayer(p *Player) {
 	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	if oldPlayer, exists := w.Players[p.ID]; exists {
+		msg := websocket.FormatCloseMessage(4000, "Logged in from another location")
+		oldPlayer.Conn.WriteMessage(websocket.CloseMessage, msg)
+		oldPlayer.Conn.Close()
+	}
+
 	w.Players[p.ID] = p
-	w.mu.Unlock()
 }
 
-func (w *World) RemovePlayer(id string) {
+func (w *World) RemovePlayer(p *Player) {
 	w.mu.Lock()
-	delete(w.Players, id)
-	w.mu.Unlock()
+	defer w.mu.Unlock()
+
+	if currentP, exists := w.Players[p.ID]; exists {
+		if currentP == p {
+			delete(w.Players, p.ID)
+		}
+	}
 }

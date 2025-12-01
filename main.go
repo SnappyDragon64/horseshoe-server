@@ -152,7 +152,8 @@ func main() {
 		if room := player.GetRoom(); room != nil {
 			room.Leave <- player
 		}
-		world.RemovePlayer(username)
+
+		world.RemovePlayer(player)
 	})
 
 	log.Println("Server running on :8080")
