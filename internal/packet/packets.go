@@ -1,7 +1,7 @@
-package packets
+package packet
 
 import (
-	"horseshoe-server/internal/utils"
+	"horseshoe-server/internal/util"
 )
 
 type ConnectPacket struct {
@@ -14,18 +14,18 @@ func NewConnectPacket(id string) *ConnectPacket {
 }
 
 type PlayerData struct {
-	ID  string        `json:"id"`
-	Pos utils.Vector2 `json:"pos"`
+	ID  string       `json:"id"`
+	Pos util.Vector2 `json:"pos"`
 }
 
 type LoadRoomPacket struct {
-	Type    string        `json:"type"`
-	RoomID  string        `json:"id"`
-	Pos     utils.Vector2 `json:"pos"`
-	Players []PlayerData  `json:"players"`
+	Type    string       `json:"type"`
+	RoomID  string       `json:"id"`
+	Pos     util.Vector2 `json:"pos"`
+	Players []PlayerData `json:"players"`
 }
 
-func NewLoadRoomPacket(roomID string, pos utils.Vector2, players []PlayerData) *LoadRoomPacket {
+func NewLoadRoomPacket(roomID string, pos util.Vector2, players []PlayerData) *LoadRoomPacket {
 	return &LoadRoomPacket{
 		Type:    "load_room",
 		RoomID:  roomID,
@@ -35,12 +35,12 @@ func NewLoadRoomPacket(roomID string, pos utils.Vector2, players []PlayerData) *
 }
 
 type SpawnPlayerPacket struct {
-	Type string        `json:"type"`
-	ID   string        `json:"id"`
-	Pos  utils.Vector2 `json:"pos"`
+	Type string       `json:"type"`
+	ID   string       `json:"id"`
+	Pos  util.Vector2 `json:"pos"`
 }
 
-func NewSpawnPlayerPacket(id string, pos utils.Vector2) *SpawnPlayerPacket {
+func NewSpawnPlayerPacket(id string, pos util.Vector2) *SpawnPlayerPacket {
 	return &SpawnPlayerPacket{Type: "spawn_player", ID: id, Pos: pos}
 }
 
@@ -54,12 +54,12 @@ func NewDeletePlayerPacket(id string) *DeletePlayerPacket {
 }
 
 type PlayerMovedPacket struct {
-	Type   string        `json:"type"`
-	ID     string        `json:"id"`
-	Target utils.Vector2 `json:"target"`
+	Type   string       `json:"type"`
+	ID     string       `json:"id"`
+	Target util.Vector2 `json:"target"`
 }
 
-func NewPlayerMovedPacket(id string, target utils.Vector2) *PlayerMovedPacket {
+func NewPlayerMovedPacket(id string, target util.Vector2) *PlayerMovedPacket {
 	return &PlayerMovedPacket{Type: "player_moved", ID: id, Target: target}
 }
 

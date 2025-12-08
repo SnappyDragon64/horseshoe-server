@@ -1,16 +1,16 @@
-package handlers
+package handler
 
 import (
 	"encoding/json"
 	"horseshoe-server/internal/game"
-	"horseshoe-server/internal/utils"
+	"horseshoe-server/internal/util"
 	"log"
 )
 
 func HandleJoin(p *game.Player, world *game.World, data []byte) {
 	var req struct {
-		Room string        `json:"room"`
-		Pos  utils.Vector2 `json:"pos"`
+		Room string       `json:"room"`
+		Pos  util.Vector2 `json:"pos"`
 	}
 
 	if err := json.Unmarshal(data, &req); err != nil {

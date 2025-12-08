@@ -2,8 +2,6 @@ package game
 
 import (
 	"encoding/json"
-	"fmt"
-	"math/rand"
 	"os"
 	"sync"
 
@@ -41,19 +39,6 @@ func NewWorld() *World {
 	}
 
 	return w
-}
-
-func (w *World) GeneratePlayerId() string {
-	w.mu.Lock()
-	defer w.mu.Unlock()
-
-	for {
-		id := fmt.Sprintf("P%d", 10000000+rand.Intn(90000000))
-
-		if _, exists := w.Players[id]; !exists {
-			return id
-		}
-	}
 }
 
 func (w *World) AddPlayer(p *Player) {

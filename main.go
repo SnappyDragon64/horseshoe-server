@@ -6,8 +6,8 @@ import (
 	"horseshoe-server/internal/auth"
 	"horseshoe-server/internal/db"
 	"horseshoe-server/internal/game"
-	"horseshoe-server/internal/handlers"
-	"horseshoe-server/internal/packets"
+	"horseshoe-server/internal/handler"
+	"horseshoe-server/internal/packet"
 	"log"
 	"net/http"
 	"os"
@@ -148,13 +148,13 @@ func main() {
 		player := game.NewPlayer(username, conn)
 		world.AddPlayer(player)
 
-		connectPkt := packets.NewConnectPacket(username)
+		connectPkt := packet.NewConnectPacket(username)
 		player.SendPacket(connectPkt)
 
 		go player.WritePump()
 
 		player.ReadPump(func(message []byte) {
-			handlers.ProcessPacket(player, world, message)
+			handler.ProcessPacket(player, world, message)
 		})
 
 		if room := player.GetRoom(); room != nil {

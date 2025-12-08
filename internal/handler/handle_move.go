@@ -1,16 +1,16 @@
-package handlers
+package handler
 
 import (
 	"encoding/json"
 	"horseshoe-server/internal/game"
-	"horseshoe-server/internal/packets"
-	"horseshoe-server/internal/utils"
+	"horseshoe-server/internal/packet"
+	"horseshoe-server/internal/util"
 	"log"
 )
 
 func HandleMove(p *game.Player, world *game.World, data []byte) {
 	var req struct {
-		Target utils.Vector2 `json:"target"`
+		Target util.Vector2 `json:"target"`
 	}
 
 	if err := json.Unmarshal(data, &req); err != nil {
@@ -20,7 +20,7 @@ func HandleMove(p *game.Player, world *game.World, data []byte) {
 
 	p.SetPos(req.Target)
 
-	pkt := packets.NewPlayerMovedPacket(p.ID, req.Target)
+	pkt := packet.NewPlayerMovedPacket(p.ID, req.Target)
 
 	if room := p.GetRoom(); room != nil {
 		room.Broadcast <- game.BroadcastMsg{

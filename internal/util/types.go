@@ -1,4 +1,4 @@
-package utils
+package util
 
 type Vector2 struct {
 	X float64 `json:"x"`

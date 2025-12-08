@@ -2,7 +2,7 @@ package game
 
 import (
 	"encoding/json"
-	"horseshoe-server/internal/utils"
+	"horseshoe-server/internal/util"
 	"log"
 	"sync"
 	"time"
@@ -21,7 +21,7 @@ type Player struct {
 	ID   string
 	Conn *websocket.Conn
 	room *Room
-	pos  utils.Vector2
+	pos  util.Vector2
 	mu   sync.RWMutex
 
 	Send chan []byte
@@ -47,13 +47,13 @@ func (p *Player) GetRoom() *Room {
 	return p.room
 }
 
-func (p *Player) SetPos(pos utils.Vector2) {
+func (p *Player) SetPos(pos util.Vector2) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.pos = pos
 }
 
-func (p *Player) GetPos() utils.Vector2 {
+func (p *Player) GetPos() util.Vector2 {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	return p.pos

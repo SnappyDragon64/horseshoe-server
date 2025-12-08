@@ -2,7 +2,7 @@ package game
 
 import (
 	"encoding/json"
-	"horseshoe-server/internal/packets"
+	"horseshoe-server/internal/packet"
 	"log"
 )
 
@@ -37,23 +37,23 @@ func (r *Room) Run() {
 			r.Players[p.ID] = p
 			p.SetRoom(r)
 
-			currentPlayersList := make([]packets.PlayerData, 0)
+			currentPlayersList := make([]packet.PlayerData, 0)
 
 			for _, existingP := range r.Players {
 				if existingP.ID == p.ID {
 					continue
 				}
 
-				currentPlayersList = append(currentPlayersList, packets.PlayerData{
+				currentPlayersList = append(currentPlayersList, packet.PlayerData{
 					ID:  existingP.ID,
 					Pos: existingP.GetPos(),
 				})
 
-				spawnPkt := packets.NewSpawnPlayerPacket(p.ID, p.GetPos())
+				spawnPkt := packet.NewSpawnPlayerPacket(p.ID, p.GetPos())
 				existingP.SendPacket(spawnPkt)
 			}
 
-			loadPkt := packets.NewLoadRoomPacket(r.ID, p.GetPos(), currentPlayersList)
+			loadPkt := packet.NewLoadRoomPacket(r.ID, p.GetPos(), currentPlayersList)
 			p.SendPacket(loadPkt)
 
 		case p := <-r.Leave:
@@ -63,7 +63,7 @@ func (r *Room) Run() {
 					p.SetRoom(nil)
 				}
 
-				leavePkt := packets.NewDeletePlayerPacket(p.ID)
+				leavePkt := packet.NewDeletePlayerPacket(p.ID)
 				for _, p_ := range r.Players {
 					p_.SendPacket(leavePkt)
 				}

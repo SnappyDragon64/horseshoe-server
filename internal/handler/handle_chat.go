@@ -1,9 +1,9 @@
-package handlers
+package handler
 
 import (
 	"encoding/json"
 	"horseshoe-server/internal/game"
-	"horseshoe-server/internal/packets"
+	"horseshoe-server/internal/packet"
 	"log"
 )
 
@@ -26,7 +26,7 @@ func HandleChat(p *game.Player, world *game.World, data []byte) {
 		return
 	}
 
-	pkt := packets.NewPlayerMessagePacket(p.ID, string(msg))
+	pkt := packet.NewPlayerMessagePacket(p.ID, string(msg))
 
 	if room := p.GetRoom(); room != nil {
 		room.Broadcast <- game.BroadcastMsg{
