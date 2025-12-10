@@ -2,6 +2,7 @@ package game
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 	"sync"
 
@@ -22,7 +23,7 @@ func NewWorld() *World {
 
 	file, err := os.ReadFile("config/rooms.json")
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to load rooms config: %v", err)
 	}
 
 	var roomNames []string
