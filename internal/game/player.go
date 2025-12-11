@@ -25,6 +25,8 @@ type Player struct {
 	mu   sync.RWMutex
 
 	Send chan []byte
+
+	closeOnce sync.Once
 }
 
 func NewPlayer(id string, conn *websocket.Conn) *Player {
@@ -69,15 +71,17 @@ func (p *Player) SendPacket(v interface{}) {
 	select {
 	case p.Send <- data:
 	default:
-		close(p.Send)
+		p.Disconnect()
 	}
 }
 
-func (p *Player) ReadPump(handleMessage func([]byte)) {
-	defer func() {
+func (p *Player) Disconnect() {
+	p.closeOnce.Do(func() {
 		p.Conn.Close()
-	}()
+	})
+}
 
+func (p *Player) ReadPump(handleMessage func([]byte)) {
 	p.Conn.SetReadLimit(maxMessageSize)
 
 	p.Conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -104,7 +108,7 @@ func (p *Player) WritePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		p.Conn.Close()
+		p.Disconnect()
 	}()
 
 	for {

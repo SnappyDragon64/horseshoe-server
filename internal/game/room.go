@@ -81,8 +81,7 @@ func (r *Room) Run() {
 					select {
 					case p.Send <- bytes:
 					default:
-						close(p.Send)
-						delete(r.Players, id)
+						p.Disconnect()
 					}
 				}
 			}

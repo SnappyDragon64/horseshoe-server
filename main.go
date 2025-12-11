@@ -148,6 +148,14 @@ func main() {
 		player := game.NewPlayer(username, conn)
 		world.AddPlayer(player)
 
+		defer func() {
+			player.Disconnect()
+			if room := player.GetRoom(); room != nil {
+				room.Leave <- player
+			}
+			world.RemovePlayer(player)
+		}()
+
 		connectPkt := packet.NewConnectPacket(username)
 		player.SendPacket(connectPkt)
 
@@ -156,12 +164,6 @@ func main() {
 		player.ReadPump(func(message []byte) {
 			handler.ProcessPacket(player, world, message)
 		})
-
-		if room := player.GetRoom(); room != nil {
-			room.Leave <- player
-		}
-
-		world.RemovePlayer(player)
 	})
 
 	log.Println("Server running on :8080")
