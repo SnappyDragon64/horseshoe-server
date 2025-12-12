@@ -4,15 +4,6 @@ import (
 	"horseshoe-server/internal/util"
 )
 
-type ConnectPacket struct {
-	Type string `json:"type"`
-	ID   string `json:"id"`
-}
-
-func NewConnectPacket(id string) *ConnectPacket {
-	return &ConnectPacket{Type: "connect", ID: id}
-}
-
 type PlayerData struct {
 	ID  string       `json:"id"`
 	Pos util.Vector2 `json:"pos"`

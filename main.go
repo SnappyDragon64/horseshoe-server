@@ -7,7 +7,6 @@ import (
 	"horseshoe-server/internal/db"
 	"horseshoe-server/internal/game"
 	"horseshoe-server/internal/handler"
-	"horseshoe-server/internal/packet"
 	"log"
 	"net/http"
 	"os"
@@ -155,9 +154,6 @@ func main() {
 			}
 			world.RemovePlayer(player)
 		}()
-
-		connectPkt := packet.NewConnectPacket(username)
-		player.SendPacket(connectPkt)
 
 		go player.WritePump()
 
