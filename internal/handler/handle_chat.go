@@ -8,6 +8,11 @@ import (
 )
 
 func HandleChat(p *game.Player, world *game.World, data []byte) {
+	if !p.ChatLimiter.Allow() {
+		p.SendPacket(packet.NewSystemMessagePacket("Slow down! You are chatting too fast."))
+		return
+	}
+
 	var req struct {
 		Message string `json:"message"`
 	}

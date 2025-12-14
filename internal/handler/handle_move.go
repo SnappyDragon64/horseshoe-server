@@ -9,6 +9,10 @@ import (
 )
 
 func HandleMove(p *game.Player, world *game.World, data []byte) {
+	if !p.MoveLimiter.Allow() {
+		return
+	}
+
 	var req struct {
 		Target util.Vector2 `json:"target"`
 	}

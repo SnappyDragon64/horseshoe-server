@@ -44,6 +44,15 @@ func NewDeletePlayerPacket(id string) *DeletePlayerPacket {
 	return &DeletePlayerPacket{Type: "delete_player", ID: id}
 }
 
+type SystemMessagePacket struct {
+	Type    string `json:"type"`
+	Message string `json:"message"`
+}
+
+func NewSystemMessagePacket(msg string) *SystemMessagePacket {
+	return &SystemMessagePacket{Type: "system_message", Message: msg}
+}
+
 type PlayerMovedPacket struct {
 	Type   string       `json:"type"`
 	ID     string       `json:"id"`

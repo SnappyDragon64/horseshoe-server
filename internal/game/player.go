@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"golang.org/x/time/rate"
 )
 
 const (
@@ -22,7 +23,11 @@ type Player struct {
 	Conn *websocket.Conn
 	room *Room
 	pos  util.Vector2
-	mu   sync.RWMutex
+
+	MoveLimiter *rate.Limiter
+	ChatLimiter *rate.Limiter
+
+	mu sync.RWMutex
 
 	Send chan []byte
 
@@ -31,9 +36,11 @@ type Player struct {
 
 func NewPlayer(id string, conn *websocket.Conn) *Player {
 	return &Player{
-		ID:   id,
-		Conn: conn,
-		Send: make(chan []byte, 1024),
+		ID:          id,
+		Conn:        conn,
+		Send:        make(chan []byte, 1024),
+		MoveLimiter: rate.NewLimiter(rate.Limit(1), 2),
+		ChatLimiter: rate.NewLimiter(rate.Limit(0.5), 1),
 	}
 }
 
