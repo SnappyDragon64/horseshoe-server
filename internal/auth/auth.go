@@ -17,6 +17,14 @@ var (
 )
 
 func Register(username, password string) error {
+	if err := ValidateUsername(username); err != nil {
+		return err
+	}
+	
+	if err := ValidatePassword(password); err != nil {
+		return err
+	}
+
 	hash, err := CreateHash(password)
 	if err != nil {
 		return err

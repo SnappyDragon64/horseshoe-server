@@ -1,8 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"horseshoe-server/internal/api"
 	"horseshoe-server/internal/auth"
 	"horseshoe-server/internal/db"
 	"horseshoe-server/internal/game"
@@ -62,54 +62,8 @@ func main() {
 
 	world := game.NewWorld()
 
-	http.HandleFunc("/api/register", enableCORS(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", 405)
-			return
-		}
-
-		var req struct {
-			Username string `json:"username"`
-			Password string `json:"password"`
-		}
-
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Bad JSON", 400)
-			return
-		}
-
-		if err := auth.Register(req.Username, req.Password); err != nil {
-			http.Error(w, "Registration failed: "+err.Error(), 409)
-			return
-		}
-
-		w.Write([]byte(`{"status":"ok"}`))
-	}))
-
-	http.HandleFunc("/api/login", enableCORS(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", 405)
-			return
-		}
-
-		var req struct {
-			Username string `json:"username"`
-			Password string `json:"password"`
-		}
-		json.NewDecoder(r.Body).Decode(&req)
-
-		token, username, err := auth.Login(req.Username, req.Password)
-		if err != nil {
-			http.Error(w, "Invalid credentials", 401)
-			return
-		}
-
-		response := map[string]string{
-			"token":    token,
-			"username": username,
-		}
-		json.NewEncoder(w).Encode(response)
-	}))
+	http.HandleFunc("/api/register", enableCORS(api.RegisterHandler))
+	http.HandleFunc("/api/login", enableCORS(api.LoginHandler))
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		tokenString := r.URL.Query().Get("token")
