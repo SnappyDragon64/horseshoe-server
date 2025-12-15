@@ -7,7 +7,10 @@ import (
 
 var (
 	usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9]{3,15}$`)
-	passwordRegex = regexp.MustCompile(`^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?~])\S{8,}$`)
+
+	passwordLenRegex     = regexp.MustCompile(`^\S{8,}$`)
+	passwordDigitRegex   = regexp.MustCompile(`[0-9]`)
+	passwordSpecialRegex = regexp.MustCompile(`[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?~]`)
 )
 
 var (
@@ -23,7 +26,7 @@ func ValidateUsername(username string) error {
 }
 
 func ValidatePassword(password string) error {
-	if !passwordRegex.MatchString(password) {
+	if !(passwordLenRegex.MatchString(password) && passwordDigitRegex.MatchString(password) && passwordSpecialRegex.MatchString(password)) {
 		return ErrInvalidPassword
 	}
 	return nil
