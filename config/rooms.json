@@ -1,4 +1,14 @@
-[
-  "ski_village",
-  "ski_hill"
-]
+{
+  "ski_village": {
+    "spawns": {
+      "default":  {"x": 0, "y": 0},
+      "ski_hill": {"x": 0, "y": 180}
+    }
+  },
+  "ski_hill": {
+    "spawns": {
+      "default":     {"x": 0, "y": -40},
+      "ski_village": {"x": 360, "y": -20}
+    }
+  }
+}

@@ -2,6 +2,7 @@ package game
 
 import (
 	"encoding/json"
+	"horseshoe-server/internal/util"
 	"log"
 	"os"
 	"sync"
@@ -9,16 +10,22 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type RoomConfig struct {
+	Spawns map[string]util.Vector2 `json:"spawns"`
+}
+
 type World struct {
-	Players map[string]*Player
-	Rooms   map[string]*Room
-	mu      sync.Mutex
+	Players     map[string]*Player
+	Rooms       map[string]*Room
+	RoomsConfig map[string]RoomConfig
+	mu          sync.Mutex
 }
 
 func NewWorld() *World {
 	w := &World{
-		Players: make(map[string]*Player),
-		Rooms:   make(map[string]*Room),
+		Players:     make(map[string]*Player),
+		Rooms:       make(map[string]*Room),
+		RoomsConfig: make(map[string]RoomConfig),
 	}
 
 	file, err := os.ReadFile("config/rooms.json")
@@ -26,15 +33,14 @@ func NewWorld() *World {
 		log.Fatalf("Failed to load rooms config: %v", err)
 	}
 
-	var roomNames []string
-	err = json.Unmarshal(file, &roomNames)
+	err = json.Unmarshal(file, &w.RoomsConfig)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to parse rooms config: %v", err)
 	}
 
-	for _, name := range roomNames {
-		r := NewRoom(name)
-		w.Rooms[name] = r
+	for id := range w.RoomsConfig {
+		r := NewRoom(id)
+		w.Rooms[id] = r
 
 		go r.Run()
 	}
