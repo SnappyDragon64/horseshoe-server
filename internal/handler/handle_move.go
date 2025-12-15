@@ -5,7 +5,7 @@ import (
 	"horseshoe-server/internal/game"
 	"horseshoe-server/internal/packet"
 	"horseshoe-server/internal/util"
-	"log"
+	"math"
 )
 
 func HandleMove(p *game.Player, world *game.World, data []byte) {
@@ -18,7 +18,10 @@ func HandleMove(p *game.Player, world *game.World, data []byte) {
 	}
 
 	if err := json.Unmarshal(data, &req); err != nil {
-		log.Println("Invalid move packet:", err)
+		return
+	}
+
+	if math.Abs(req.Target.X) > 10000 || math.Abs(req.Target.Y) > 10000 {
 		return
 	}
 
