@@ -1,8 +1,8 @@
 {
   "ski_village": {
     "spawns": {
-      "default":  {"x": 0, "y": 0},
-      "ski_hill": {"x": 0, "y": 180}
+      "default":  {"x": 0, "y": 180},
+      "ski_hill": {"x": -280, "y": 64}
     }
   },
   "ski_hill": {
