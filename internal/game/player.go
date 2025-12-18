@@ -40,7 +40,7 @@ func NewPlayer(id string, conn *websocket.Conn) *Player {
 		Conn:        conn,
 		Send:        make(chan []byte, 1024),
 		MoveLimiter: rate.NewLimiter(rate.Limit(1), 2),
-		ChatLimiter: rate.NewLimiter(rate.Limit(0.5), 1),
+		ChatLimiter: rate.NewLimiter(rate.Limit(1), 5),
 	}
 }
 
