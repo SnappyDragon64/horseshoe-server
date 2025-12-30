@@ -14,15 +14,22 @@ var JwtSecret []byte
 var (
 	ErrUserNotFound       = errors.New("user not found")
 	ErrInvalidCredentials = errors.New("invalid credentials")
+	ErrUserExists         = errors.New("username is already taken")
 )
 
 func Register(username, password string) error {
 	if err := ValidateUsername(username); err != nil {
 		return err
 	}
-	
+
 	if err := ValidatePassword(password); err != nil {
 		return err
+	}
+
+	var count int64
+	db.DB.Model(&db.User{}).Where("username = ?", username).Count(&count)
+	if count > 0 {
+		return ErrUserExists
 	}
 
 	hash, err := CreateHash(password)

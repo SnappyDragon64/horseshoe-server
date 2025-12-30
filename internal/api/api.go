@@ -2,13 +2,14 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"horseshoe-server/internal/auth"
 	"net/http"
 )
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", 405)
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -18,12 +19,18 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Bad JSON", 400)
+		http.Error(w, "Bad JSON", http.StatusBadRequest)
 		return
 	}
 
 	if err := auth.Register(req.Username, req.Password); err != nil {
-		http.Error(w, "Registration failed: "+err.Error(), 409)
+		if errors.Is(err, auth.ErrInvalidUsername) || errors.Is(err, auth.ErrInvalidPassword) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		} else if errors.Is(err, auth.ErrUserExists) {
+			http.Error(w, err.Error(), http.StatusConflict)
+		} else {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		}
 		return
 	}
 
